@@ -5,7 +5,7 @@ services:
 
 env:
   global:
-    - BUILD_CMD=./build_all_configs.sh
+    - BUILD_CMD=./build_config.sh
     - BUILD_DIR=/workdir
     - DOCKER_IMAGE=multiarch/crossbuild
 

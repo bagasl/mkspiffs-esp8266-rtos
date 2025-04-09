@@ -1,6 +1,44 @@
 # mkspiffs
 Tool to build and unpack [SPIFFS](https://github.com/pellepl/spiffs) images.
 
+## Settings for ESP8266-RTOS-SDK 4MB Flash
+
+### Sdkconfig
+```
+  CONFIG_PARTITION_TABLE_CUSTOM=y
+  CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+  CONFIG_PARTITION_TABLE_OFFSET=0x8000
+  CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+  CONFIG_SPIFFS_MAX_PARTITIONS=3
+  CONFIG_SPIFFS_CACHE=y
+  CONFIG_SPIFFS_CACHE_WR=y
+  CONFIG_SPIFFS_PAGE_CHECK=y
+  CONFIG_SPIFFS_GC_MAX_RUNS=10
+  CONFIG_SPIFFS_PAGE_SIZE=256
+  CONFIG_SPIFFS_OBJ_NAME_LEN=32
+  CONFIG_SPIFFS_USE_MAGIC=y
+  CONFIG_SPIFFS_USE_MAGIC_LENGTH=y
+  CONFIG_SPIFFS_META_LENGTH=4
+  CONFIG_SPIFFS_USE_MTIME=y
+```
+
+### partitions.csv
+```csv
+# Name               , Type, SubType, Offset  , Size    , Flags
+# 24 KB for NVS
+nvs                  , data, nvs    , 0x9000  , 0x6000  , 
+# 4 KB for PHY
+phy_init             , data, phy    , 0xf000  , 0x1000  , 
+# 1 MB for app
+factory              , app , factory, 0x10000 , 0x100000, 
+# ~2.93 MB for SPIFFS
+spiffs               , data, spiffs , 0x110000, 0x2F0000, 
+```
+### Build and flash
+```
+	mkspiffs -p 256 -c spiffs_data/ -s 0x2F0000 spiffs.bin
+	$(IDF_PATH)/components/esptool_py/esptool/esptool.py --chip esp8266 --port /dev/ttyUSB0 --baud 115200 write_flash 0x110000 spiffs.bin
+```
 
 ## Usage
 
